@@ -23,21 +23,21 @@ export class ProductsService {
     @InjectRepository(ProductImage)
     private readonly productImageRepository: Repository<ProductImage>,
   ) {}
+
   async create(createProductDto: CreateProductDto) {
     try {
       const { images = [], ...productDetails } = createProductDto;
 
       const product = this.productRepository.create({
         ...productDetails,
-        images: images.map((url) =>
-          this.productImageRepository.create({ url }),
+        images: images.map((image) =>
+          this.productImageRepository.create({ url: image }),
         ),
       });
 
-      console.log(product.images?.length, product.images);
-
       await this.productRepository.save(product);
-      return product;
+
+      return { ...product, images };
     } catch (error) {
       this.errorHandler(error);
     }
